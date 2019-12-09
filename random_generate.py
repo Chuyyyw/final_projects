@@ -35,8 +35,8 @@ def randomRole(d_freq, obs):
     """
     # TODO: to determine the frequencies, driver:0.4, rider:0.6
     roles = ['driver', 'rider']
-    d_num = obs*d_freq
-    r_num = obs*(1-d_freq)
+    d_num = int(obs*d_freq)
+    r_num = int(obs*(1-d_freq))
 
     ind = [0] * d_num + [1] * r_num
 
