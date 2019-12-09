@@ -7,6 +7,7 @@ import copy
 def randomLoc(lonLat, radius):
     """
     Generate one random point according to the given conditions.
+    # TODO: may need some changes about the output format.
 
     :param lonLat: the longitude and latitude of center. Tuple.
     :param radius: the radius for generating points randomly
