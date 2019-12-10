@@ -16,7 +16,7 @@ def randomLoc(latLon, radius):
     """
     lat = latLon[0]
     lon = latLon[1]
-    r = radius # / 111300 # if need some unit transform
+    r = radius/69 # / 111300 # if need some unit transform
     u = np.random.uniform(0, 1)
     v = np.random.uniform(0, 1)
     w = r * u # random radius of the point # r * np.sqrt(u) for uniformly on a disc
