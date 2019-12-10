@@ -34,7 +34,6 @@ def randomRole(d_num, obs):
     :param obs: the number of observations to be generated
     :return: driver or rider
     """
-    # TODO: to determine the frequencies, driver:0.4, rider:0.6
     roles = ['driver', 'rider']
     r_num = obs - d_num
 
@@ -227,11 +226,11 @@ def outTxt(obs, d_num, source_list, des_list, slotDict, numDict, iterId):
     print('output%s.txt has been output.'%iterId)
 
     output = open('output%s.txt' %iterId, 'w+')
-    output.write('{0:<5}, '.format('id') + '{0:<7}, '.format('role') + '{0:<30}, '.format('slots')
-                     + '{0:<40}, '.format('source') + '{0:<40}, '.format('destination') + '\n')
+    output.write('{0:<5} | '.format('id') + '{0:<7} | '.format('role') + '{0:<30} | '.format('slots')
+                     + '{0:<40} | '.format('source') + '{0:<40} | '.format('destination') + '\n')
     for i in range(obs):
-        output.write('{0:<5}, '.format(i+1) + '{0:<7}, '.format(roleL[i]) + '%30s, ' % slotL[i]
-                     + '{}, '.format(sourceL[i]) + '{}, '.format(desL[i]) + '\n')
+        output.write('{0:<5} | '.format(i+1) + '{0:<7} | '.format(roleL[i]) + '%30s | ' % slotL[i]
+                     + '{} | '.format(sourceL[i]) + '{} | '.format(desL[i]) + '\n')
     output.close()
 
 
