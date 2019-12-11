@@ -1,5 +1,5 @@
 import pygeodesy.ellipsoidalVincenty as ev
-
+import matplotlib.pyplot as plt
 class user(object):
     # TODO: create values for each variables based on the Monte Carlo
     def __init__(self, user_line):
@@ -44,19 +44,39 @@ def match_pair(driver, rider, interval, driver_prefer_time):
     driver_increase_slots = pickup_slots + dropoff_slots
     if driver_end_slot > rider.start_slot-1 and driver_start_slot-1 <= rider.end_slot \
             and driver_increase_slots<=driver_prefer_time:
-        return 'matched'
+        return ('matched', pickup_time + dropoff_time)
     else:
         return 'unmatched'
 
+filelist = []
+file_no =0
+result_dic = {}
+match_rates=[]
+adjusted_match_rates=[]
+output = open('match_result.txt', 'w+')
+output.write('{0:<7},'.format('trial') + '{0:<12},'.format('total_user') + '{0:<12},'.format('drivers')
+             + '{0:<12},'.format('riders') + '{0:<12},'.format('match_rate')
+             + '{0:<22},'.format('adjusted_match_rate') + '{0:<25}'.format('avg_driver_increase_time')+'\n')
+for i in range(100):
+    iterId = i+1
+    filename = 'output%s.txt'%iterId
+    filelist.append(filename)
 
-filepath=['output10.txt',]
 
-unmatched_drivers = []
-unmatched_riders = []
-matches = []
-all_users=[]
-user_number = 0
-for filename in filepath:
+for filename in filelist:
+    print(filename)
+    file_no +=1
+    unmatched_drivers = []
+    unmatched_riders = []
+    increase_time = 0
+    matches = []
+    all_users=[]
+    user_number = 0
+    drivers_no = 0
+    riders_no = 0
+    increase_time = 0
+    #slot_len = [0,0,0,0,0,0,0,0]
+
     with open(filename, 'r') as users:
         next(users)
         for line in users:
@@ -66,39 +86,62 @@ for filename in filepath:
             user_object = user(user_features)
             user_number+=1
             all_users.append(user_object)
-            # print(user_object.toString())
-            # print(user_object.start)
+            # for i in range(1,9):
+            #     if user_object.end_slot - user_object.start_slot +1 == i:
+            #         slot_len[i-1] +=1
+
             if user_object.role == 'driver':
+                drivers_no += 1
                 driver = user_object
                 matched = False
 
                 for unmatched_rider in unmatched_riders:
-                    match_result = match_pair(driver, unmatched_rider, 15, 4)
-                    if match_result == 'matched':
+                    match_result = match_pair(driver, unmatched_rider, 15, 1)
+                    if match_result[0] == 'matched':
+                        matched = True
+                        increase_time += match_result[1]
                         new_pair = [driver, unmatched_rider]
                         matches.extend(new_pair)
                         unmatched_riders.remove(unmatched_rider)
-                        matched = True
                         break
                 if matched == False:
                     unmatched_drivers.append(driver)
             else:
+                riders_no += 1
                 rider = user_object
                 matched = False
 
                 for unmatched_driver in unmatched_drivers:
-                    match_result = match_pair(unmatched_driver, rider, 15, 4)
+                    match_result = match_pair(unmatched_driver, rider, 15, 1)
                     if match_result == 'matched':
+                        matched = True
+                        increase_time += match_result[1]
                         new_pair = [unmatched_driver, rider]
                         matches.extend(new_pair)
                         unmatched_drivers.remove(unmatched_driver)
                         break
                 if matched == False:
                     unmatched_riders.append(rider)
+    users.close()
 
-match_rate = len(matches)/user_number
-print(match_rate, len(all_users), user_number)
+    match_rate = round(len(matches)/user_number,3)
+    adjusted_match_rate = round(len(matches)/(drivers_no*2),3)
+    # match_rates.append(match_rate)
+    adjusted_match_rates.append(adjusted_match_rate)
+    average_increase_time = round(increase_time*2/len(matches), 3)
+    output.write('{0:<7},'.format(file_no) + '{0:<12},'.format(str(user_number)) + '{0:<12},'.format(str(drivers_no))
+                 + '{0:<12},'.format(str(riders_no)) + '{0:<12},'.format(str(match_rate))
+                 + '{0:<22},'.format(str(adjusted_match_rate)) + '{0:<25} '.format(str(average_increase_time))+'\n')
+    # result_dic['output'+str(file_no)] = (match_rate, adjusted_match_rate, len(matches),
+    #                                      len(unmatched_drivers), len(unmatched_riders), drivers_no, riders_no)
+    # print(slot_len)
+    print('{0:<7},'.format(file_no) + '{0:<12},'.format(str(user_number)) + '{0:<12},'.format(str(drivers_no))
+          + '{0:<12},'.format(str(riders_no)) + '{0:<12},'.format(str(match_rate))
+          + '{0:<22},'.format(str(adjusted_match_rate)) + '{0:<25} '.format(str(average_increase_time))+'\n')
 
-
+output.close()
+plt.hist(adjusted_match_rates)
+plt.show()
+print(result_dic)
 
 
