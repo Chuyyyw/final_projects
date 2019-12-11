@@ -108,7 +108,7 @@ def randomSandD(obs, source_list, des_list):
 
     return randSource, randDes
 
-
+"""
 # TODO: need to be imporved.
 
 def sumPossibility(slotDict, slotIdxSeg):
@@ -123,7 +123,7 @@ def sumPossibility(slotDict, slotIdxSeg):
     poss = sum(list(map(lambda x: slotDict[x], slotIdxSeg)))
 
     return poss
-
+"""
 
 def subSetLObs(slotDict, length, obsL, subsetL):
     """
