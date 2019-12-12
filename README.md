@@ -15,9 +15,9 @@ Organizational start point for course project repositories
 
   - Some mapping rules will be created in order to successfully match drivers and riders (randomly chosen by users) within  qualified and user-defined time and location ranges. Below are two hypotheses will be tested at the end.
 
-    - a. The daily matching rate is above 85%;
+    - a. The daily matching rate is above 95%;
   
-    - b. The average matched-up driver-rider pairs' distances is between 2 to 3 miles.
+    - b. The promotions for increasing 3 slots chosen by users could help to increase the match rate.
 
 **4. GitHub Repository**
 
