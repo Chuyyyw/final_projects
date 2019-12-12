@@ -1,3 +1,4 @@
+# Chuyi Wang
 # Student's t-test for dependent samples
 import matplotlib.pyplot as plt
 import seaborn as sns
