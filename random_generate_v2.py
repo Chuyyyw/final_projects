@@ -1,4 +1,4 @@
-# Xingnuo Duan
+# Chuyi Wang update
 
 import numpy as np
 import random
@@ -34,7 +34,6 @@ def randomRole(d_num, obs):
     :param obs: the number of observations to be generated
     :return: driver or rider
     """
-    # TODO: to determine the frequencies, driver:0.4, rider:0.6
     roles = ['driver', 'rider']
     r_num = obs - d_num
 
@@ -108,7 +107,7 @@ def randomSandD(obs, source_list, des_list):
 
     return randSource, randDes
 
-"""
+
 # TODO: need to be imporved.
 
 def sumPossibility(slotDict, slotIdxSeg):
@@ -123,46 +122,28 @@ def sumPossibility(slotDict, slotIdxSeg):
     poss = sum(list(map(lambda x: slotDict[x], slotIdxSeg)))
 
     return poss
-"""
 
-def subSetLObs(slotDict, length, obsL, subsetL):
-    """
-    Calculate the possibility of each subset having same length.
-
-    :param slotDict: a dictionary containing the possibilities for each slot
-    :param subsetL: all the subsets with same length that are available
-    :param length: the length of elements in subsetL
-    :param obsL: the number of observations to get from this length of subsets
-    :return: a list of paired up subsets and their possibilities
-    """
-    # random choose subsets from the distribution
-    subAll = []
-    slots = list(slotDict.keys())
-    p = list(slotDict.values())
-    for i in range(int(obsL**2)):
-        a = list(np.random.choice(slots, length, p))
-        a.sort()
-        subAll.append(a)
-
-    subAll = list(filter(lambda x: len(x) == length, subAll))
-    subAll = list(filter(lambda x: max(x) - min(x) + 1 == len(x), subAll))
-
-    l_num = list(map(lambda x: int(obsL*subAll.count(x)/len(subAll)), subsetL))
-
-    return l_num
-
-
+# alternative solution: directly give list of consecutive element:
+def sublist(total_slots, maxNum):
+    subsets = [[]]
+    for i in range(total_slots):
+        initial = i+1
+        end = min(total_slots, initial+maxNum+1)
+        for j in range(initial, end):
+            sub = [*range(initial, j)]
+            subsets.append(sub)
+    return subsets
 
 
 def randomSlots(slotDict, numDict, obs):
     """
     A function to randomly generate the time slots user chose.
     1. get all the subsets of the slots
-    2. get rid of the subsets whose length is longer than maxNum
+    2. get rid of the subsets whose length is longer than
     3. get rid of the subsets whose slots are not continuous
     4. get the possibilities1 of each choice within different lengths of subsets, then scale them
     5. multiply the slots number preference possibilities2 with possibilities1 to get the final possibilities for each
-       remaining subset
+       remaining subsetmaxNum
     6. generate slots with the new frequencies
 
     :param slotDict: a dictionary containing the possibilities for each slot
@@ -170,41 +151,40 @@ def randomSlots(slotDict, numDict, obs):
     :return: the list of slots. List.
     """
     # step 1: subsets
-    nums = list(range(len(slotDict)))
-    subsets = [[]]
+    # nums = list(range(len(slotDict)))
+    # subsets = [[]]
 
-    for n in nums:
-        prev = copy.deepcopy(subsets)
-        [k.append(n) for k in subsets]
-        subsets.extend(prev)
-
-    # step 2
+    # for n in nums:
+    #     prev = copy.deepcopy(subsets)
+    #     [k.append(n) for k in subsets]
+    #     subsets.extend(prev)
+    #
+    # # step 2
     max_num = max(numDict.keys())
-    subsets = list(filter(lambda x: len(x) <= max_num and len(x) != 0, subsets))
+    # subsets = list(filter(lambda x: len(x) <= max_num and len(x) != 0, subsets))
+    #
+    # # step 3
+    # subsets = list(filter(lambda x: max(x) - min(x) + 1 == len(x), subsets))
 
-    # step 3
-    subsets = list(filter(lambda x: max(x) - min(x) + 1 == len(x), subsets))
+    # alternative solution: directly give list of consecutive element:
+    max_num = max(numDict.keys())
+    total_slots = len(slotDict)
+    subsets = sublist(total_slots, max_num)
 
     # step 4 & step 5 & step 6
-    """
     posses = list(map(lambda x: round(sumPossibility(slotDict, x), 3), subsets))
     pair_list = list(zip(subsets, posses))
     l_list = list(map(len, subsets))
-    """
     clusters = []
 
     for l in range(1, max_num+1):
         p_choice = numDict[l]
         obs_choice = p_choice*obs
-        subsetL = list(filter(lambda x: len(x) == l, subsets))
-        """
         idx = [i for i, val in enumerate(l_list) if val == l]
         sub = [pair_list[i][0] for i in idx]
         poss = [pair_list[i][1] for i in idx]
         s = sum(poss)
         l_num = list(map(lambda x: int(round((x/s)*p_choice, 5)*obs), poss))
-        """
-        l_num = subSetLObs(slotDict, l, obs_choice, subsetL)
 
         if sum(l_num) > obs_choice:
             res = sum(l_num) - obs_choice
@@ -221,7 +201,7 @@ def randomSlots(slotDict, numDict, obs):
 
         l_num = list(map(int, l_num))
 
-        newlist = list(zip(subsetL, l_num))
+        newlist = list(zip(sub, l_num))
         cluster = list(map(lambda x: [x[0]]*x[1], newlist))
         flat_cluster = [item for sublist in cluster for item in sublist]
 
@@ -256,11 +236,11 @@ def outTxt(obs, d_num, source_list, des_list, slotDict, numDict, iterId):
     roleL = randomRole(d_num, obs)
     slotL = randomSlots(slotDict, numDict, obs)
     sourceL, desL = randomSandD(obs, source_list, des_list)
-    print('output%s.txt has been output.'%iterId)
+    print('output_r%s.txt has been output.'%iterId)
 
-    output = open('output%s.txt' %iterId, 'w+')
+    output = open('output_r%s.txt' %iterId, 'w+')
     output.write('{0:<5} | '.format('id') + '{0:<7} | '.format('role') + '{0:<30} | '.format('slots')
-                     + '{0:<40} | '.format('source') + '{0:<40} | '.format('destination') + '\n')
+                 + '{0:<40} | '.format('source') + '{0:<40} | '.format('destination') + '\n')
     for i in range(obs):
         output.write('{0:<5} | '.format(i+1) + '{0:<7} | '.format(roleL[i]) + '%30s | ' % slotL[i]
                      + '{} | '.format(sourceL[i]) + '{} | '.format(desL[i]) + '\n')
@@ -302,7 +282,7 @@ p = [0.002, 0.003, 0.025, 0.03, 0.06, 0.055, 0.11, 0.10, 0.17, 0.14, 0.15, 0.10,
 slots = list(range(len(p)))
 slotDict = dict(zip(slots, p))
 
-preference = [0.1, 0.2, 0.25, 0.25, 0.1, 0.05, 0.025, 0.025]
+preference = [0.1, 0.3, 0.25, 0.21, 0.06, 0.04, 0.025, 0.015]
 choice = list(range(1, len(preference)+1))
 numDict = dict(zip(choice, preference))
 
@@ -322,7 +302,7 @@ slot = randomSlots(slotDict, numDict, 100)
 # print(slot)
 """
 
-dynamicOut(1000, 0.4, source, destination, slotDict, numDict, 10)
+dynamicOut(3000, 0.4, source, destination, slotDict, numDict, 100)
 
 """
 
